@@ -45,10 +45,11 @@ def current_category(request, pk):
 
 def get_exact_category(request, pk):
     exact_category = models.Category.objects.get(id=pk)
+    categories = models.Category.objects.all()
+    category_products = models.Product.objects.filter(product_category=exact_category)
 
-    category_product = models.Product.objects.filter(product_category=exact_category)
-
-    return render(request, 'exact_category.html', {'category_product': category_product})
+    return render(request, 'categrory_products.html', {'category_products': category_products,
+                                                       'categories': categories})
 
 
 #
@@ -64,14 +65,16 @@ def exact_product(request, pk):
                                    total_for_product=total_for_product)
         return redirect('/cart')
 
-    return render(request, 'exact_product.html', context)
+    return render(request, 'about_product.html', context)
 
 
 
 def get_user_cart(request, ):
     user_cart = models.Cart.objects.filter(user_id=request.user.id)
-
-    return render(request, 'user_cart.html', {'cart': user_cart})
+    total = sum([i.total_for_product for i in user_cart])
+    context = {'cart': user_cart,
+               'total': total}
+    return render(request, 'user_cart.html',  context)
 
 
 # Оформление заказа
